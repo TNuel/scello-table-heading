@@ -2,7 +2,7 @@
   <div class="relative">
     <input
       type="text"
-      v-model="searchQuery"
+      v-model="prop.searchQuery"
       placeholder="Search Users by Name, Email or Date"
       class="w-full pl-10 pr-4 bg-bgColor py-2 hover:border hover:bg-white active:bg-white focus:border-borderColor placeholder:text-textColor/70 rounded focus:outline-none focus:ring-2 focus:ring-primary"
     />
@@ -26,18 +26,12 @@
 </template>
 
 <script setup>
-import { defineComponent, ref } from "vue";
+import { ref } from "vue";
 
-defineComponent({
-  name: "SearchInput",
-  setup() {
-    const searchQuery = ref("");
+const prop = defineProps({
+  searchQuery: ""
+})
 
-    return {
-      searchQuery,
-    };
-  },
-});
 </script>
 
 <style scoped>
