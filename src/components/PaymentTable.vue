@@ -74,7 +74,7 @@
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white">
           <thead class="bg-bgColor">
-            <tr class="text-left py-2 px-4 text-textColor font-normal border-b">
+            <tr class="text-left text-textColor font-normal border-b">
               <th class="py-2 px-4 border-b">
                 <div>
                   <svg
@@ -127,11 +127,8 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="user in filteredUsers"
-            :key="user.name">
-              <tr
-                class="hover:bg-gray-100 text-left"
-              >
+            <template v-for="user in filteredUsers" :key="user.name">
+              <tr class="hover:bg-gray-100 text-left">
                 <td class="py-2 px-4 border-b">
                   <div class="flex items-center space-x-8">
                     <svg
@@ -153,8 +150,18 @@
                       />
                     </svg>
                     <div class="cursor-pointer">
-                      <img v-if="!user.showDetails" @click="toggleDetails(user.id)" src="../assets/icons-svg/circle-down-icon.svg" alt="down icon">
-                      <img v-if="user.showDetails" @click="toggleDetails(user.id)" src="../assets/icons-svg/circle-up-icon.svg" alt="up icon">
+                      <img
+                        v-if="!user.showDetails"
+                        @click="toggleDetails(user.id)"
+                        src="../assets/icons-svg/circle-down-icon.svg"
+                        alt="down icon"
+                      />
+                      <img
+                        v-if="user.showDetails"
+                        @click="toggleDetails(user.id)"
+                        src="../assets/icons-svg/circle-up-icon.svg"
+                        alt="up icon"
+                      />
                     </div>
                   </div>
                 </td>
@@ -178,7 +185,9 @@
                     class="px-2 py-1 rounded-md text-white"
                     >{{ user.paymentStatus.status }}</span
                   >
-                  <div class="text-sm text-gray-600">{{ user.paymentDate }}</div>
+                  <div class="text-sm text-gray-600">
+                    {{ user.paymentDate }}
+                  </div>
                 </td>
                 <td class="py-2 px-4 border-b">
                   <div>{{ user.amount }} USD</div>
@@ -201,33 +210,53 @@
                   </div>
                 </td>
               </tr>
-              <tr
-              v-if="user.showDetails"
-              class="bg-gray-50"
-              >
+              <tr v-if="user.showDetails" class="bg-gray-50">
                 <td colspan="5" class="py-2 px-4">
-                  <table class="max-w-full">
+                  <table class="w-10/12 mx-auto">
                     <thead>
                       <tr class="text-left uppercase">
                         <th class="py-2 px-4 border-b font-normal">Date</th>
-                        <th class="py-2 px-4 border-b font-normal">User Activity</th>
-                        <th class="py-2 px-4 border-b flex items-center font-normal">Detail <span>
-                          <img class="mx-3" src="../assets/icons-svg/info-icon.svg" alt="info-icon">
-                        </span></th>
+                        <th class="py-2 px-4 border-b font-normal">
+                          User Activity
+                        </th>
+                        <th
+                          class="py-2 px-4 border-b flex items-center font-normal"
+                        >
+                          Detail
+                          <span>
+                            <img
+                              class="mx-3"
+                              src="../assets/icons-svg/info-icon.svg"
+                              alt="info-icon"
+                            />
+                          </span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="activity in user.activities"
+                      <template
+                      v-for="activity in user.activities"
                         :key="activity.date"
-                        class="text-left"
+                      
                       >
-                        <td class="py-2 px-4 border-b">{{ activity.date }}</td>
-                        <td class="py-2 px-4 border-b">
-                          {{ activity.activity }}
+                      <tr v-if="user.activities.length == 0">
+                        <td colspan="3" class="uppercase p-4 text-center flex justify-center items-center w-full bg-red-300">
+                          <h1 class="font-semibold text-textColor">No Record Found</h1>
                         </td>
-                        <td class="py-2 px-4 border-b">{{ activity.detail }}</td>
                       </tr>
+                        <tr v-if="user.activities" class="text-left">
+                          <td class="py-2 px-4 border-b">
+                            {{ activity.date }}
+                          </td>
+                          <td class="py-2 px-4 border-b">
+                            {{ activity.activity }}
+                          </td>
+                          <td class="py-2 px-4 border-b">
+                            {{ activity.detail }}
+                          </td>
+                        </tr>
+                      </template>
+                      
                     </tbody>
                   </table>
                 </td>
@@ -330,8 +359,8 @@ const handleClick = () => {
 };
 
 const toggleDetails = (index) => {
-  console.log("show details", index)
-  users.value[index-1].showDetails = !users.value[index-1].showDetails;
+  console.log("show details", index);
+  users.value[index - 1].showDetails = !users.value[index - 1].showDetails;
 };
 </script>
 
