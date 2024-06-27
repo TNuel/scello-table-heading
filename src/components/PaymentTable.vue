@@ -33,9 +33,9 @@
       <div class="flex justify-between p-3 items-center">
         <div class="flex space-x-8 w-1/2">
           <!-- Filter -->
-          <div class="flex space-x-4">
+          <!-- <div class="flex space-x-4">
             <div
-              class="flex justify-between space-x-2 items-center p-2 border rounded border-borderColor bg-white"
+              class="flex justify-between space-x-2 items-center p-2 border rounded border-borderColor bg-white hover:border-primary active:border-primary"
             >
               <svg
                 width="20"
@@ -60,7 +60,8 @@
                 <span class="text-textColor">Filter</span>
               </h3>
             </div>
-          </div>
+          </div> -->
+          <FilterMenu />
           <!-- Search -->
           <search-input class="w-full"></search-input>
         </div>
@@ -264,6 +265,9 @@
             </template>
           </tbody>
         </table>
+        <PaginationVue :totalItems="totalItems"
+      @update:rowsPerPage="handleRowsPerPageUpdate"
+      @update:page="handlePageUpdate" />
       </div>
     </div>
   </div>
@@ -272,7 +276,10 @@
 <script setup>
 import { ref, computed } from "vue";
 import Button from "./utils/ButtonComponent.vue";
+import FilterMenu from "./utils/FilterMenu.vue";
+import PaginationVue from "./utils/Pagination.vue";
 import SearchInput from "./utils/SearchInput.vue";
+
 
 const search = ref("");
 const activeTab = ref("All");
@@ -341,6 +348,19 @@ const users = ref([
   },
   // Add more user data as needed
 ]);
+
+const totalItems = ref(100); // Replace with the actual total items count
+
+    const handleRowsPerPageUpdate = (rowsPerPage) => {
+      // Handle the rows per page update
+      console.log('Rows per page updated to:', rowsPerPage);
+    };
+
+    const handlePageUpdate = (page) => {
+      // Handle the page update
+      console.log('Page updated to:', page);
+    };
+
 const filteredUsers = computed(() => {
   return users.value.filter((user) => {
     const searchMatch =
