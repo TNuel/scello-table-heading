@@ -33,34 +33,6 @@
       <div class="flex justify-between p-3 items-center">
         <div class="flex space-x-8 w-1/2">
           <!-- Filter -->
-          <!-- <div class="flex space-x-4">
-            <div
-              class="flex justify-between space-x-2 items-center p-2 border rounded border-borderColor bg-white hover:border-primary active:border-primary"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clip-path="url(#clip0_134_770)">
-                  <path
-                    d="M12 12L20 4V0H0V4L8 12V20L12 16V12Z"
-                    fill="#25213B"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_134_770">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              <h3>
-                <span class="text-textColor">Filter</span>
-              </h3>
-            </div>
-          </div> -->
           <FilterMenu />
           <!-- Search -->
           <search-input class="w-full"></search-input>
@@ -128,8 +100,14 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="user in filteredUsers" :key="user.name">
-              <tr class="hover:bg-gray-100 text-left">
+            <template v-for="(user, index) in filteredUsers" :key="user.name">
+              <tr
+                :class="{ 'bg-bgColor': isActiveRow(index) }"
+                @click="setActiveRow(index)"
+                @mouseenter="setFocusedRow(index)"
+                @mouseleave="clearFocusedRow"
+                class="hover:bg-gray-100 text-left"
+              >
                 <td class="py-2 px-4 border-b">
                   <div class="flex items-center space-x-8">
                     <svg
@@ -194,7 +172,7 @@
                   <div>{{ user.amount }} USD</div>
                   <button class="text-blue-600 text-sm">View More</button>
                 </td>
-                <td>
+                <td class="py-2 px-4 border-b">
                   <div>
                     <svg
                       width="20"
@@ -211,17 +189,17 @@
                   </div>
                 </td>
               </tr>
-              <tr v-if="user.showDetails" class="bg-gray-50">
-                <td colspan="5" class="py-2 px-4">
-                  <table class="w-10/12 mx-auto">
+              <tr v-if="user.showDetails" class="bg-bgColor/80">
+                <td colspan="6" class="">
+                  <table class="w-11/12">
                     <thead>
-                      <tr class="text-left uppercase">
-                        <th class="py-2 px-4 border-b font-normal">Date</th>
-                        <th class="py-2 px-4 border-b font-normal">
+                      <tr class="text-left uppercase border-b">
+                        <th class="py-2 px-4 text-sm font-normal">Date</th>
+                        <th class="py-2 px-4 text-sm font-normal">
                           User Activity
                         </th>
                         <th
-                          class="py-2 px-4 border-b flex items-center font-normal"
+                          class="py-2 px-4 text-sm flex items-center font-normal"
                         >
                           Detail
                           <span>
@@ -236,28 +214,31 @@
                     </thead>
                     <tbody>
                       <template
-                      v-for="activity in user.activities"
-                        :key="activity.date"
-                      
+                       v-if="user.activities"
                       >
-                      <tr v-if="user.activities.length == 0">
-                        <td colspan="3" class="uppercase p-4 text-center flex justify-center items-center w-full bg-red-300">
-                          <h1 class="font-semibold text-textColor">No Record Found</h1>
-                        </td>
-                      </tr>
-                        <tr v-if="user.activities" class="text-left">
-                          <td class="py-2 px-4 border-b">
+                        <tr v-for="activity in user.activities"
+                        :key="activity.date" class="text-left">
+                          <td class="py-2 text-sm px-4 border-b">
                             {{ activity.date }}
                           </td>
-                          <td class="py-2 px-4 border-b">
+                          <td class="py-2 text-sm px-4 border-b">
                             {{ activity.activity }}
                           </td>
-                          <td class="py-2 px-4 border-b">
+                          <td class="py-2 text-sm px-4 border-b">
                             {{ activity.detail }}
                           </td>
                         </tr>
                       </template>
-                      
+                      <tr v-if="user.activities.length < 1">
+                        <td
+                          colspan="6"
+                          class="uppercase p-4"
+                        >
+                          <h1 class="font-semibold text-tertiary">
+                            No Record Found
+                          </h1>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </td>
@@ -265,9 +246,11 @@
             </template>
           </tbody>
         </table>
-        <PaginationVue :totalItems="totalItems"
-      @update:rowsPerPage="handleRowsPerPageUpdate"
-      @update:page="handlePageUpdate" />
+        <PaginationVue
+          :totalItems="totalItems"
+          @update:rowsPerPage="handleRowsPerPageUpdate"
+          @update:page="handlePageUpdate"
+        />
       </div>
     </div>
   </div>
@@ -280,11 +263,22 @@ import FilterMenu from "./utils/FilterMenu.vue";
 import PaginationVue from "./utils/Pagination.vue";
 import SearchInput from "./utils/SearchInput.vue";
 
-
 const search = ref("");
 const activeTab = ref("All");
 const tabs = ref(["All", "Paid", "Unpaid", "Overdue"]);
 const users = ref([
+  {
+    id: 0,
+    name: "Justina Septimus",
+    email: "justina@email.com",
+    userStatus: { status: "Inactive", color: "bg-green-500" },
+    lastLogin: "16/APR/2023",
+    paymentStatus: { status: "Paid", color: "bg-green-500" },
+    paymentDate: "Paid on 15/JUN/2020",
+    amount: 230,
+    showDetails: false,
+    activities: [],
+  },
   {
     id: 1,
     name: "Justin Septimus",
@@ -295,6 +289,7 @@ const users = ref([
     paymentDate: "Paid on 15/APR/2020",
     amount: 200,
     showDetails: false,
+    activities: [],
   },
   {
     id: 2,
@@ -349,17 +344,36 @@ const users = ref([
   // Add more user data as needed
 ]);
 
+const activeRow = ref(null);
+const focusedRow = ref(null);
+
+const setActiveRow = (index) => {
+  activeRow.value = index;
+};
+
+const setFocusedRow = (index) => {
+  focusedRow.value = index;
+};
+
+const clearFocusedRow = () => {
+  focusedRow.value = null;
+};
+
+const isActiveRow = (index) => {
+  return index === activeRow.value || index === focusedRow.value;
+};
+
 const totalItems = ref(100); // Replace with the actual total items count
 
-    const handleRowsPerPageUpdate = (rowsPerPage) => {
-      // Handle the rows per page update
-      console.log('Rows per page updated to:', rowsPerPage);
-    };
+const handleRowsPerPageUpdate = (rowsPerPage) => {
+  // Handle the rows per page update
+  console.log("Rows per page updated to:", rowsPerPage);
+};
 
-    const handlePageUpdate = (page) => {
-      // Handle the page update
-      console.log('Page updated to:', page);
-    };
+const handlePageUpdate = (page) => {
+  // Handle the page update
+  console.log("Page updated to:", page);
+};
 
 const filteredUsers = computed(() => {
   return users.value.filter((user) => {
@@ -380,7 +394,7 @@ const handleClick = () => {
 
 const toggleDetails = (index) => {
   console.log("show details", index);
-  users.value[index - 1].showDetails = !users.value[index - 1].showDetails;
+  users.value[index].showDetails = !users.value[index].showDetails;
 };
 </script>
 
