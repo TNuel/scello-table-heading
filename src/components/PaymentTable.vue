@@ -23,7 +23,10 @@
         </button>
       </div>
       <div class="text-[14px]">
-        Total payable amount: <span class="text-primary"><b>$900.00</b> </span>
+        Total payable amount:
+        <span class="text-primary"
+          ><b>${{ totalAmountForPage }}</b>
+        </span>
         <span>USD</span>
       </div>
     </div>
@@ -35,7 +38,7 @@
           <!-- Filter -->
           <FilterMenu />
           <!-- Search -->
-          <search-input class="w-full"></search-input>
+          <search-input :searchQuery="searchTerm" class="w-full"></search-input>
         </div>
         <!-- button -->
         <Button variant="primary" size="md" @click="handleClick"
@@ -78,10 +81,10 @@
               <th class="font-normal py-2 px-4">
                 <h1>Payment Status</h1>
               </th>
-              <th class="font-normal py-2 px-4">
+              <th class="font-normal text-right py-2 px-4">
                 <h1>Amount</h1>
               </th>
-              <th class="py-2 px-4">
+              <th class="py-2 px-4 flex justify-end">
                 <div>
                   <svg
                     width="20"
@@ -145,16 +148,28 @@
                   </div>
                 </td>
                 <td class="py-2 px-4 border-b">
-                  <div>{{ user.name }}</div>
-                  <div class="text-sm text-gray-600">{{ user.email }}</div>
+                  <div class="text-sm font-medium text-textColor">
+                    {{ user.name }}
+                  </div>
+                  <div class="text-tertiary text-xs font-normal">
+                    {{ user.email }}
+                  </div>
                 </td>
                 <td class="py-2 px-4 border-b">
                   <span
-                    :class="user.userStatus.color"
+                  :class="{
+          'bg-green-100 text-[#47B881]':
+            user.userStatus.status === 'Active',
+          'bg-red-100 text-red-500 ': user.userStatus.status === 'Overdue',
+          'bg-yellow-100 text-yellow-500':
+            user.userStatus.status === 'Unpaid',
+        }"
                     class="px-2 py-1 rounded-md text-white"
-                    >{{ user.userStatus.status }}</span
                   >
-                  <div class="text-sm text-gray-600">
+                    <b class="text-4xl -mt-6">.</b>
+                    {{ user.userStatus.status }}</span
+                  >
+                  <div class="text-sm text-tertiary font-medium">
                     Last login: {{ user.lastLogin }}
                   </div>
                 </td>
@@ -164,16 +179,19 @@
                     class="px-2 py-1 rounded-md text-white"
                     >{{ user.paymentStatus.status }}</span
                   >
-                  <div class="text-sm text-gray-600">
+                  <div class="text-sm text-textColor text-[12px] font-medium">
                     {{ user.paymentDate }}
                   </div>
                 </td>
-                <td class="py-2 px-4 border-b">
-                  <div>{{ user.amount }} USD</div>
-                  <button class="text-blue-600 text-sm">View More</button>
+                <td class="py-2 px-4 text-right border-b">
+                  <div class="text-textColor text-sm font-medium">
+                    ${{ user.amount }}
+                  </div>
+                  <div class="text-tertiary text-xs font-normal">USD</div>
                 </td>
                 <td class="py-2 px-4 border-b">
-                  <div>
+                  <div class="flex justify-between">
+                    <button class="text-tertiary text-sm">View More</button>
                     <svg
                       width="20"
                       height="20"
@@ -213,11 +231,12 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <template
-                       v-if="user.activities"
-                      >
-                        <tr v-for="activity in user.activities"
-                        :key="activity.date" class="text-left">
+                      <template v-if="user.activities">
+                        <tr
+                          v-for="activity in user.activities"
+                          :key="activity.date"
+                          class="text-left"
+                        >
                           <td class="py-2 text-sm px-4 border-b">
                             {{ activity.date }}
                           </td>
@@ -230,10 +249,7 @@
                         </tr>
                       </template>
                       <tr v-if="user.activities.length < 1">
-                        <td
-                          colspan="6"
-                          class="uppercase p-4"
-                        >
+                        <td colspan="6" class="uppercase p-4">
                           <h1 class="font-semibold text-tertiary">
                             No Record Found
                           </h1>
@@ -263,7 +279,7 @@ import FilterMenu from "./utils/FilterMenu.vue";
 import PaginationVue from "./utils/Pagination.vue";
 import SearchInput from "./utils/SearchInput.vue";
 
-const search = ref("");
+const searchTerm = ref("");
 const activeTab = ref("All");
 const tabs = ref(["All", "Paid", "Unpaid", "Overdue"]);
 const users = ref([
@@ -341,11 +357,37 @@ const users = ref([
       },
     ],
   },
+  {
+    name: "Mira Horwitz",
+    email: "example@email.com",
+    userStatus: { status: "Active", color: "bg-green-500" },
+    lastLogin: "14/APR/2020",
+    paymentStatus: { status: "Unpaid", color: "bg-yellow-500" },
+    paymentDate: "Dues on 15/APR/2020",
+    amount: 250,
+    showDetails: false,
+    activities: [
+      {
+        date: "08/APR/2020",
+        activity: "Lorem ipsum dolor sit amet",
+        detail:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
+      },
+      {
+        date: "07/APR/2020",
+        activity: "Lorem ipsum dolor sit amet",
+        detail:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
+      },
+    ],
+  },
   // Add more user data as needed
 ]);
 
 const activeRow = ref(null);
 const focusedRow = ref(null);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
 
 const setActiveRow = (index) => {
   activeRow.value = index;
@@ -376,10 +418,13 @@ const handlePageUpdate = (page) => {
 };
 
 const filteredUsers = computed(() => {
+  // if (!searchTerm.value) {
+  //       return users;
+  //     }
   return users.value.filter((user) => {
     const searchMatch =
-      user.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.value.toLowerCase());
+      user.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.value.toLowerCase());
     const tabMatch =
       activeTab.value === "All" ||
       user.value.paymentStatus.status.toLowerCase() ===
@@ -396,6 +441,34 @@ const toggleDetails = (index) => {
   console.log("show details", index);
   users.value[index].showDetails = !users.value[index].showDetails;
 };
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Paid":
+      return "bg-secondary/50";
+    case "Overdue":
+      return "bg-negative/50";
+    case "Unpaid":
+      return "bg-[#965E00]/50";
+    default:
+      return "bg-gray-500";
+  }
+};
+
+const paginatedAndFilteredUsers = computed(() => {
+  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+  const endIndex = startIndex + itemsPerPage.value;
+  return filteredUsers.value.slice(startIndex, endIndex);
+});
+
+const totalAmountForPage = computed(() => {
+  return paginatedAndFilteredUsers.value.reduce(
+    (sum, user) => sum + user.amount, 0);
+});
+
+// const totalAmountForPage = computed(() => {
+//   return users.value.reduce((sum, user) => sum + user.amount, 0);
+// });
 </script>
 
 <style scoped>
