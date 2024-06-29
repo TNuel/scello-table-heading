@@ -34,7 +34,7 @@ import { computed } from "vue";
       const baseClasses =
         "font-inter font-bold rounded focus:outline-none focus:ring-2 focus:ring-offset-2";
       const variantClasses = {
-        primary: "bg-primary/80 text-white rounded-[6px] hover:bg-primarry focus:ring-primary",
+        primary: "bg-primary/80 text-white rounded-[6px] hover:bg-primary focus:ring-primary",
         secondary:
           "bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500",
         success:

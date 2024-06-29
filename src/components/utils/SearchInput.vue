@@ -2,7 +2,8 @@
   <div class="relative">
     <input
       type="text"
-      v-model="prop.searchQuery"
+      :value="searchTerm"
+      @input="updateSearchTerm"
       placeholder="Search Users by Name, Email or Date"
       class="w-full pl-10 pr-4 bg-bgColor py-2 hover:border hover:bg-white active:bg-white focus:border-borderColor placeholder:text-textColor/70 rounded focus:outline-none focus:ring-2 focus:ring-primary"
     />
@@ -26,12 +27,30 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from 'vue';
 
-const prop = defineProps({
-  searchQuery: ""
-})
+const props = defineProps({
+  searchTerm: {
+    type: String,
+    default: ''
+  }
+});
 
+const searchTerm = ref(props.searchTerm);
+const emit = defineEmits(['update:searchTerm']);
+
+const updateSearchTerm = ($event) => {
+  searchTerm.value = $event.target.value;
+  // console.log(searchTerm.value);
+  emit('update:searchTerm', searchTerm.value);
+};
+
+// Watch for external changes to props.searchTerm to keep local state in sync
+watch(() => props.searchTerm, (newVal) => {
+  if (newVal !== searchTerm.value) {
+    searchTerm.value = newVal;
+  }
+});
 </script>
 
 <style scoped>
