@@ -32,6 +32,9 @@ const prop = defineProps({
   searchQuery: ""
 })
 
+// Optionally, emit an event when the search query changes
+defineEmits('search', prop.searchQuery);
+
 </script>
 
 <style scoped>

@@ -1,0 +1,187 @@
+[
+  {
+    "id": 0,
+    "name": "Justina Septimus",
+    "email": "justina@email.com",
+    "userStatus": { "status": "Inactive", "color": "bg-green-500" },
+    "lastLogin": "16/APR/2023",
+    "paymentStatus": { "status": "Paid", "color": "bg-green-500" },
+    "paymentDate": "Paid on 15/JUN/2020",
+    "amount": 230,
+    "showDetails": false,
+    "activities": []
+  },
+  {
+    "id": 1,
+    "name": "Justin Septimus",
+    "email": "example@email.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "14/APR/2020",
+    "paymentStatus": { "status": "Paid", "color": "bg-green-500" },
+    "paymentDate": "Paid on 15/APR/2020",
+    "amount": 200,
+    "showDetails": false,
+    "activities": []
+  },
+  {
+    "id": 2,
+    "name": "Justin Septimus",
+    "email": "example@email.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "14/APR/2020",
+    "paymentStatus": { "status": "Paid", "color": "bg-green-500" },
+    "paymentDate": "Paid on 15/APR/2020",
+    "amount": 200,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "12/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "11/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Anika Rhiel Madsen",
+    "email": "example@email.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "14/APR/2020",
+    "paymentStatus": { "status": "Overdue", "color": "bg-red-500" },
+    "paymentDate": "Dued on 15/APR/2020",
+    "amount": 300,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "10/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "09/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Mira Horwitz",
+    "email": "example@email.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "14/APR/2020",
+    "paymentStatus": { "status": "Unpaid", "color": "bg-yellow-500" },
+    "paymentDate": "Dues on 15/APR/2020",
+    "amount": 250,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "08/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "07/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "14/APR/2020",
+    "paymentStatus": { "status": "Unpaid", "color": "bg-yellow-500" },
+    "paymentDate": "Dues on 15/APR/2020",
+    "amount": 250,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "08/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "07/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "userStatus": { "status": "Inactive", "color": "bg-red-500" },
+    "lastLogin": "12/APR/2020",
+    "paymentStatus": { "status": "Paid", "color": "bg-green-500" },
+    "paymentDate": "Paid on 10/APR/2020",
+    "amount": 350,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "06/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "05/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Alice Johnson",
+    "email": "alice.johnson@example.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "10/APR/2020",
+    "paymentStatus": { "status": "Unpaid", "color": "bg-yellow-500" },
+    "paymentDate": "Dues on 20/APR/2020",
+    "amount": 300,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "04/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "03/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Mira Horwitz",
+    "email": "example@email.com",
+    "userStatus": { "status": "Active", "color": "bg-green-500" },
+    "lastLogin": "14/APR/2020",
+    "paymentStatus": { "status": "Unpaid", "color": "bg-yellow-500" },
+    "paymentDate": "Dues on 15/APR/2020",
+    "amount": 250,
+    "showDetails": false,
+    "activities": [
+      {
+        "date": "08/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      },
+      {
+        "date": "07/APR/2020",
+        "activity": "Lorem ipsum dolor sit amet",
+        "detail": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum."
+      }
+    ]
+  }
+]

@@ -25,7 +25,7 @@
       <div class="text-[14px]">
         Total payable amount:
         <span class="text-primary"
-          ><b>${{ totalAmountForPage }}</b>
+          ><b>${{ totalAmountPayable }}</b>
         </span>
         <span>USD</span>
       </div>
@@ -53,6 +53,11 @@
             <tr class="text-left text-textColor font-normal border-b">
               <th class="py-2 px-4 border-b">
                 <div>
+                  <!-- <input
+                    type="checkbox"
+                    @change="toggleSelectAll"
+                    :checked="isAllSelected"
+                  />
                   <svg
                     width="20"
                     height="20"
@@ -69,7 +74,8 @@
                       stroke="#8B83BA"
                       stroke-width="1.5"
                     />
-                  </svg>
+                  </svg> -->
+                  <Checkbox @update:modelValue="toggleSelectAll" :modelValue="isAllSelected" />
                 </div>
               </th>
               <th class="font-normal py-2 px-4">
@@ -103,7 +109,7 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="(user, index) in filteredUsers" :key="user.name">
+            <template v-for="(user, index) in filteredUsers" :key="user.id">
               <tr
                 :class="{ 'bg-bgColor': isActiveRow(index) }"
                 @click="setActiveRow(index)"
@@ -113,7 +119,7 @@
               >
                 <td class="py-2 px-4 border-b">
                   <div class="flex items-center space-x-8">
-                    <svg
+                    <!-- <svg
                       width="20"
                       height="20"
                       class="cursor-pointer"
@@ -130,7 +136,8 @@
                         stroke="#8B83BA"
                         stroke-width="1.5"
                       />
-                    </svg>
+                    </svg> -->
+                    <Checkbox :modelValue="selectedUsers.includes(user)" @update:modelValue="(value) => updateSelectedUsers(value, user)" />
                     <div class="cursor-pointer">
                       <img
                         v-if="!user.showDetails"
@@ -157,14 +164,15 @@
                 </td>
                 <td class="py-2 px-4 border-b">
                   <span
-                  :class="{
-          'bg-green-100 text-[#47B881]':
-            user.userStatus.status === 'Active',
-          'bg-red-100 text-red-500 ': user.userStatus.status === 'Overdue',
-          'bg-yellow-100 text-yellow-500':
-            user.userStatus.status === 'Unpaid',
-        }"
-                    class="px-2 py-1 rounded-md text-white"
+                    :class="{
+                      'bg-[#4A4AFF]/10 text-[#4A4AFF]':
+                        user.userStatus.status === 'Active',
+                      'bg-textColor/10 text-tertiary ':
+                        user.userStatus.status === 'Inactive',
+                      'bg-yellow-100 text-yellow-500':
+                        user.userStatus.status === 'Unpaid',
+                    }"
+                    class="px-2 py-1 rounded-full text-xs font-medium"
                   >
                     <b class="text-4xl -mt-6">.</b>
                     {{ user.userStatus.status }}</span
@@ -175,9 +183,18 @@
                 </td>
                 <td class="py-2 px-4 border-b">
                   <span
-                    :class="user.paymentStatus.color"
-                    class="px-2 py-1 rounded-md text-white"
-                    >{{ user.paymentStatus.status }}</span
+                    :class="{
+                      'bg-secondary/20 text-secondary':
+                        user.paymentStatus.status === 'Paid',
+                      'bg-negative/20 text-negative':
+                        user.paymentStatus.status === 'Overdue',
+                      'bg-[#965E00]/20 text-[#965E00]':
+                        user.paymentStatus.status === 'Unpaid',
+                    }"
+                    class="px-2 py-1 rounded-full text-xs font-medium"
+                  >
+                    <b class="text-4xl -mt-6">.</b>
+                    {{ user.paymentStatus.status }}</span
                   >
                   <div class="text-sm text-textColor text-[12px] font-medium">
                     {{ user.paymentDate }}
@@ -273,8 +290,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useUserStore } from "../stores/userStore";
+
 import Button from "./utils/ButtonComponent.vue";
+import Checkbox from "./utils/Checkbox.vue";
 import FilterMenu from "./utils/FilterMenu.vue";
 import PaginationVue from "./utils/Pagination.vue";
 import SearchInput from "./utils/SearchInput.vue";
@@ -282,107 +302,8 @@ import SearchInput from "./utils/SearchInput.vue";
 const searchTerm = ref("");
 const activeTab = ref("All");
 const tabs = ref(["All", "Paid", "Unpaid", "Overdue"]);
-const users = ref([
-  {
-    id: 0,
-    name: "Justina Septimus",
-    email: "justina@email.com",
-    userStatus: { status: "Inactive", color: "bg-green-500" },
-    lastLogin: "16/APR/2023",
-    paymentStatus: { status: "Paid", color: "bg-green-500" },
-    paymentDate: "Paid on 15/JUN/2020",
-    amount: 230,
-    showDetails: false,
-    activities: [],
-  },
-  {
-    id: 1,
-    name: "Justin Septimus",
-    email: "example@email.com",
-    userStatus: { status: "Active", color: "bg-green-500" },
-    lastLogin: "14/APR/2020",
-    paymentStatus: { status: "Paid", color: "bg-green-500" },
-    paymentDate: "Paid on 15/APR/2020",
-    amount: 200,
-    showDetails: false,
-    activities: [],
-  },
-  {
-    id: 2,
-    name: "Justin Septimus",
-    email: "example@email.com",
-    userStatus: { status: "Active", color: "bg-green-500" },
-    lastLogin: "14/APR/2020",
-    paymentStatus: { status: "Paid", color: "bg-green-500" },
-    paymentDate: "Paid on 15/APR/2020",
-    amount: 200,
-    showDetails: false,
-    activities: [
-      {
-        date: "12/APR/2020",
-        activity: "Lorem ipsum dolor sit amet",
-        detail:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
-      },
-      {
-        date: "11/APR/2020",
-        activity: "Lorem ipsum dolor sit amet",
-        detail:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Anika Rhiel Madsen",
-    email: "example@email.com",
-    userStatus: { status: "Active", color: "bg-green-500" },
-    lastLogin: "14/APR/2020",
-    paymentStatus: { status: "Overdue", color: "bg-red-500" },
-    paymentDate: "Dued on 15/APR/2020",
-    amount: 300,
-    showDetails: false,
-    activities: [
-      {
-        date: "10/APR/2020",
-        activity: "Lorem ipsum dolor sit amet",
-        detail:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
-      },
-      {
-        date: "09/APR/2020",
-        activity: "Lorem ipsum dolor sit amet",
-        detail:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
-      },
-    ],
-  },
-  {
-    name: "Mira Horwitz",
-    email: "example@email.com",
-    userStatus: { status: "Active", color: "bg-green-500" },
-    lastLogin: "14/APR/2020",
-    paymentStatus: { status: "Unpaid", color: "bg-yellow-500" },
-    paymentDate: "Dues on 15/APR/2020",
-    amount: 250,
-    showDetails: false,
-    activities: [
-      {
-        date: "08/APR/2020",
-        activity: "Lorem ipsum dolor sit amet",
-        detail:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
-      },
-      {
-        date: "07/APR/2020",
-        activity: "Lorem ipsum dolor sit amet",
-        detail:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies justo et lacus fringilla bibendum.",
-      },
-    ],
-  },
-  // Add more user data as needed
-]);
+const selectedUsers = ref([]);
+const isChecked = ref(false)
 
 const activeRow = ref(null);
 const focusedRow = ref(null);
@@ -417,18 +338,29 @@ const handlePageUpdate = (page) => {
   console.log("Page updated to:", page);
 };
 
+const store = useUserStore();
+
+const getUsers = () => {
+  store.fetchData().then((res) => {
+    totalItems.value = res.data.length;
+  });
+};
+
+const users = store.users;
+
 const filteredUsers = computed(() => {
   // if (!searchTerm.value) {
   //       return users;
   //     }
-  return users.value.filter((user) => {
+  console.log(users);
+  return users.filter((user) => {
     const searchMatch =
       user.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.value.toLowerCase());
+    // console.log('search match =>', searchMatch)
     const tabMatch =
       activeTab.value === "All" ||
-      user.value.paymentStatus.status.toLowerCase() ===
-        activeTab.value.toLowerCase();
+      user.paymentStatus.status.toLowerCase() === activeTab.value.toLowerCase();
     return searchMatch && tabMatch;
   });
 });
@@ -439,21 +371,28 @@ const handleClick = () => {
 
 const toggleDetails = (index) => {
   console.log("show details", index);
-  users.value[index].showDetails = !users.value[index].showDetails;
+  users[index].showDetails = !users[index].showDetails;
 };
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case "Paid":
-      return "bg-secondary/50";
-    case "Overdue":
-      return "bg-negative/50";
-    case "Unpaid":
-      return "bg-[#965E00]/50";
-    default:
-      return "bg-gray-500";
+const toggleSelectAll = (value) => {
+  if (value) {
+    selectedUsers.value = [...paginatedAndFilteredUsers.value];
+  } else {
+    selectedUsers.value = [];
   }
 };
+
+const updateSelectedUsers = (value, user) => {
+  if (value) {
+    selectedUsers.value.push(user);
+  } else {
+    selectedUsers.value = selectedUsers.value.filter((u) => u !== user);
+  }
+};
+
+const isAllSelected = computed(() => {
+  return selectedUsers.value.length === paginatedAndFilteredUsers.value.length;
+});
 
 const paginatedAndFilteredUsers = computed(() => {
   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
@@ -461,9 +400,16 @@ const paginatedAndFilteredUsers = computed(() => {
   return filteredUsers.value.slice(startIndex, endIndex);
 });
 
-const totalAmountForPage = computed(() => {
-  return paginatedAndFilteredUsers.value.reduce(
-    (sum, user) => sum + user.amount, 0);
+const totalAmountPayable = computed(() => {
+  return paginatedAndFilteredUsers.value.reduce((sum, user) => {
+    if (
+      user.paymentStatus.status === "Unpaid" ||
+      user.paymentStatus.status === "Overdue"
+    ) {
+      return sum + user.amount;
+    }
+    return sum;
+  }, 0);
 });
 
 // const totalAmountForPage = computed(() => {
