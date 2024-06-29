@@ -38,11 +38,14 @@
           <!-- Filter -->
           <FilterMenu />
           <!-- Search -->
-          <search-input :searchQuery="searchTerm" class="w-full"></search-input>
+          <search-input
+            v-model:searchQuery="searchTerm"
+            class="w-full"
+          ></search-input>
         </div>
         <!-- button -->
-        <Button variant="primary" size="md" @click="handleClick"
-          ><h2 class="font-semibold px-2 py-1">PAY DUES</h2></Button
+        <Button variant="primary" size="md" @click="markAsPaid"
+          ><h2 class="font-semibold px-1 py-2">PAY DUES</h2></Button
         >
       </div>
 
@@ -75,7 +78,10 @@
                       stroke-width="1.5"
                     />
                   </svg> -->
-                  <Checkbox @update:modelValue="toggleSelectAll" :modelValue="isAllSelected" />
+                  <Checkbox
+                    @update:modelValue="toggleSelectAll"
+                    :modelValue="isAllSelected"
+                  />
                 </div>
               </th>
               <th class="font-normal py-2 px-4">
@@ -109,11 +115,11 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="(user, index) in filteredUsers" :key="user.id">
+            <template v-for="(user, id) in filteredUsers" :key="id">
               <tr
-                :class="{ 'bg-bgColor': isActiveRow(index) }"
-                @click="setActiveRow(index)"
-                @mouseenter="setFocusedRow(index)"
+                :class="{ 'bg-bgColor': isActiveRow(id) }"
+                @click="setActiveRow(id)"
+                @mouseenter="setFocusedRow(id)"
                 @mouseleave="clearFocusedRow"
                 class="hover:bg-gray-100 text-left"
               >
@@ -137,17 +143,22 @@
                         stroke-width="1.5"
                       />
                     </svg> -->
-                    <Checkbox :modelValue="selectedUsers.includes(user)" @update:modelValue="(value) => updateSelectedUsers(value, user)" />
+                    <Checkbox
+                      :modelValue="selectedUsers.includes(user)"
+                      @update:modelValue="
+                        (value) => updateSelectedUsers(value, user)
+                      "
+                    />
                     <div class="cursor-pointer">
                       <img
                         v-if="!user.showDetails"
-                        @click="toggleDetails(user.id)"
+                        @click="toggleDetails(user.id - 1)"
                         src="../assets/icons-svg/circle-down-icon.svg"
                         alt="down icon"
                       />
                       <img
                         v-if="user.showDetails"
-                        @click="toggleDetails(user.id)"
+                        @click="toggleDetails(user.id - 1)"
                         src="../assets/icons-svg/circle-up-icon.svg"
                         alt="up icon"
                       />
@@ -299,34 +310,36 @@ import FilterMenu from "./utils/FilterMenu.vue";
 import PaginationVue from "./utils/Pagination.vue";
 import SearchInput from "./utils/SearchInput.vue";
 
+const store = useUserStore();
 const searchTerm = ref("");
 const activeTab = ref("All");
 const tabs = ref(["All", "Paid", "Unpaid", "Overdue"]);
 const selectedUsers = ref([]);
-const isChecked = ref(false)
+const isChecked = ref(false);
 
 const activeRow = ref(null);
 const focusedRow = ref(null);
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const currentPage = store.$state.currentPage;
+const itemsPerPage = store.$state.usersPerPage;
 
-const setActiveRow = (index) => {
-  activeRow.value = index;
+const setActiveRow = (id) => {
+  activeRow.value = id;
 };
 
-const setFocusedRow = (index) => {
-  focusedRow.value = index;
+const setFocusedRow = (id) => {
+  focusedRow.value = id;
 };
 
 const clearFocusedRow = () => {
   focusedRow.value = null;
 };
 
-const isActiveRow = (index) => {
-  return index === activeRow.value || index === focusedRow.value;
+const isActiveRow = (id) => {
+  return id === activeRow.value || id === focusedRow.value;
 };
+const totalItems = store.users.length;
 
-const totalItems = ref(100); // Replace with the actual total items count
+const totalPage = Math.ceil(totalItems / itemsPerPage);
 
 const handleRowsPerPageUpdate = (rowsPerPage) => {
   // Handle the rows per page update
@@ -338,40 +351,32 @@ const handlePageUpdate = (page) => {
   console.log("Page updated to:", page);
 };
 
-const store = useUserStore();
-
-const getUsers = () => {
-  store.fetchData().then((res) => {
-    totalItems.value = res.data.length;
-  });
-};
-
-const users = store.users;
-
+const users = store.paginatedUsers;
+console.log(store.paginatedUsers);
 const filteredUsers = computed(() => {
-  // if (!searchTerm.value) {
-  //       return users;
-  //     }
+  let filtered = users;
   console.log(users);
-  return users.filter((user) => {
-    const searchMatch =
-      user.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.value.toLowerCase());
-    // console.log('search match =>', searchMatch)
-    const tabMatch =
-      activeTab.value === "All" ||
-      user.paymentStatus.status.toLowerCase() === activeTab.value.toLowerCase();
-    return searchMatch && tabMatch;
-  });
+  if (!searchTerm.value) {
+    return filtered;
+  }
+  if (activeTab.value !== "all") {
+    filtered = users.filter(
+      (user) => user.paymentStatus.status.toLowerCase() === activeTab.value
+    );
+  }
+  if (searchTerm.value) {
+    filtered = filtered.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.value.toLowerCase())
+    );
+  }
+  return filtered;
 });
 
-const handleClick = () => {
-  console.log("clicked");
-};
-
-const toggleDetails = (index) => {
-  console.log("show details", index);
-  users[index].showDetails = !users[index].showDetails;
+const toggleDetails = (id) => {
+  console.log("show details", id);
+  users[id].showDetails = !users[id].showDetails;
 };
 
 const toggleSelectAll = (value) => {
@@ -395,9 +400,9 @@ const isAllSelected = computed(() => {
 });
 
 const paginatedAndFilteredUsers = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  const endIndex = startIndex + itemsPerPage.value;
-  return filteredUsers.value.slice(startIndex, endIndex);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return store.paginatedUsers.slice(startIndex, endIndex);
 });
 
 const totalAmountPayable = computed(() => {
@@ -411,6 +416,21 @@ const totalAmountPayable = computed(() => {
     return sum;
   }, 0);
 });
+
+const markAsPaid = () => {
+console.log('changing unpaid to paid');
+  selectedUsers.value.forEach((user) => {
+    if (
+      user.paymentStatus.status === "Unpaid" ||
+      user.paymentStatus.status === "Overdue"
+    ) {
+      user.paymentStatus.status = "Paid";
+      user.paymentStatus.color = "bg-green-500";
+      user.paymentDate = "Paid on " + new Date().toLocaleDateString();
+    }
+  });
+  selectedUsers.value = [];
+};
 
 // const totalAmountForPage = computed(() => {
 //   return users.value.reduce((sum, user) => sum + user.amount, 0);

@@ -4,36 +4,29 @@ import data from "../../public/data.json"
 export const useUserStore = defineStore("userStore", {
   state: () => ({
     users: data,
+    currentPage: 1,
+    usersPerPage: 10
   }),
   getters: {
-    getItemById: (state) => (id) => {
-      return state.users.find(item => item.id === id);
-    },
-    // Other getters as needed
+    paginatedUsers: (state) => {
+      const start = (state.currentPage - 1) * state.usersPerPage;
+      const end = start + state.usersPerPage;
+      return state.users.slice(start, end);
+    }
   },
   actions: {
-    setUser(users) {
-        this.users = users
-    },
-    async fetchData() {
-      try {
-        
-        const response = await fetch("/user.json"); // Adjust the path as per your project structure
-        const data = await response.json();
-        console.log(data);
-        this.users = data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    nextPage() {
+        if (this.currentPage < Math.ceil(this.items.length / this.itemsPerPage)) {
+          this.currentPage++;
+        }
+      },
+      prevPage() {
+        if (this.currentPage > 1) {
+          this.currentPage--;
+        }
+      },
+      setPage(pageNumber) {
+        this.currentPage = pageNumber;
       }
-    },
-    addUser(user) {
-      this.users.push(user);
-    },
-    updateUser(index, updatedUser) {
-      this.users[index] = updatedUser;
-    },
-    removeUser(index) {
-      this.users.splice(index, 1);
-    },
   },
 });
